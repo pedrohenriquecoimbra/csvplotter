@@ -1,0 +1,3 @@
+y_var,ylim,y_label,labs,regex,origin_file,x_var,xlim,x_label,savn,qaqc,hue,size,style,units,weights,title
+value,,,,,,value,,,co2_flux-wd,,,,,,,
+value,,"$FCO_2\ (\mu mol m^{-2}s^{-1})$",,,,time,,Hour of the day,co2_flux-hod,,,,,,,

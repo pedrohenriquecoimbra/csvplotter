@@ -1,3 +1,31 @@
+Metadata-Version: 2.1
+Name: csvplotter
+Version: 0.0.1
+Summary: Plotter using .csv filesWritten by pedrohenriquecoimbra
+Home-page: https://github.com/pedrohenriquecoimbra/csvplotter
+Author: Pedro Henrique Coimbra
+Author-email: pedro-henrique.herig-coimbra@inrae.fr
+License: MIT
+Keywords: EC,partitionning,wavelet
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Other Environment
+Classifier: Framework :: Jupyter
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Topic :: Other/Nonlisted Topic
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
 # **Plotter Module**
 
 A Python module to generate plots from a CSV configuration file using `seaborn`. This module allows you to create custom plots by reading plot configurations directly from a CSV file and automatically generating the plots according to the specified settings.
@@ -132,3 +160,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 You can modify and expand this template as your project evolves! It should give users a clear guide on how to get started with your module.
+

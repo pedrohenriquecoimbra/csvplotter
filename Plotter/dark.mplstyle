@@ -1,0 +1,7 @@
+axes.facecolor : black
+figure.facecolor : black
+text.color : white
+axes.labelcolor : white
+xtick.color : white
+ytick.color : white
+grid.color : grey

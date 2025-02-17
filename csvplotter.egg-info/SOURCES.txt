@@ -1,0 +1,11 @@
+LICENSE
+README.md
+setup.py
+Plotter/__init__.py
+Plotter/plotter.py
+Plotter/version.py
+csvplotter.egg-info/PKG-INFO
+csvplotter.egg-info/SOURCES.txt
+csvplotter.egg-info/dependency_links.txt
+csvplotter.egg-info/requires.txt
+csvplotter.egg-info/top_level.txt
