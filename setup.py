@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from setuptools import find_packages, setup
 
-from Plotter import version
+from csvplotter import version
 
 setup(
     name='csvplotter',
