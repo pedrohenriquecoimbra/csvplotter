@@ -1,4 +1,5 @@
 import os
+import ast
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -124,8 +125,12 @@ class Plotter:
         plt.figure(figsize=Plotter._get_figure_size(
             config.get('aspect', 'big')))
         
-        plot = sns.lineplot(data=data, x=config['x_var'], y=config['y_var'],
-                            hue=config['hue'], style=config['style'], size=config['size'])
+        if isinstance(config['y_var'], str):
+            config['y_var'] = [config['y_var']]
+            
+        for y in config['y_var']:
+            plot = sns.lineplot(data=data, x=config['x_var'], y=y,
+                                hue=config['hue'], style=config['style'], size=config['size'])
         
         if config['x_label']:
             plt.xlabel(config['x_label'])
@@ -158,6 +163,10 @@ class Plotter:
                 'None').replace({'None': None})
         else:
             config_df = pd.DataFrame(config)
+        
+        # Convert the y_var column to a list
+        config_df['y_var'] = config_df['y_var'].replace(
+            {None: "[]"}).apply(lambda x: ast.literal_eval(x) if '[' in x else x)
 
         # Prepare the list of jobs for multi-processing
         jobs = []
