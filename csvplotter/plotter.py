@@ -118,12 +118,11 @@ class Plotter:
     
     def plot(self, config, save_as=None, data=None, dpi=None, legend_kwargs={}, **kwargs):
         """ Plot based on the configuration from CSV """
+        if data is None:  # Check explicitly for None
+            data = self.data  # Use self.data if no data is provided
         self.apply_style(self.style)
         
         #self._set_theme(config.get('theme', 'light'), config.get('palette', 'viridis'))
-
-        if data is None:  # Check explicitly for None
-            data = self.data  # Use self.data if no data is provided
         
         plt.figure(figsize=Plotter._get_figure_size(
             config.get('aspect', 'big')))
