@@ -127,7 +127,7 @@ class Plotter:
         #self._set_theme(config.get('theme', 'light'), config.get('palette', 'viridis'))
         
         plt.figure(figsize=Plotter._get_figure_size(
-            config.get('aspect', 'big')))
+            config.get('aspect', 'wide')))
         
         if isinstance(config['y_var'], str):
             config['y_var'] = [config['y_var']]
