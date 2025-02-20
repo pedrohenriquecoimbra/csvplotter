@@ -1,2 +1,3 @@
 csvplotter.egg-info/*
+csvplotter/__pycache__
 build/*
