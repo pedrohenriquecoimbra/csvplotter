@@ -122,6 +122,19 @@ class Plotter:
             data = self.data  # Use self.data if no data is provided
 
         config.update(kwargs)
+
+        # Set the y_var as a list if it is a string
+        if isinstance(config['y_var'], str):
+            config['y_var'] = [config['y_var']]
+
+        # Only keep the columns that are present in the data
+        config['x_var'] = config['x_var'] if config['x_var'] in data.columns else ''
+        config['y_var'] = [y for y in config['y_var'] if y in data.columns]
+
+        # Set the labels if not provided
+        if not config.get('y_var_label', None):
+            config['y_var_label'] = config['y_var']
+
         self.apply_style(self.style)
         
         #self._set_theme(config.get('theme', 'light'), config.get('palette', 'viridis'))
