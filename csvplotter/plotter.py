@@ -116,7 +116,7 @@ class Plotter:
             self.plot(config, *args, **kwargs)
         return
     
-    def plot(self, config, save_as=None, data=None, dpi=None):
+    def plot(self, config, save_as=None, data=None, dpi=None, legend_kwargs={}, **kwargs):
         """ Plot based on the configuration from CSV """
         self.apply_style(self.style)
         
@@ -148,6 +148,8 @@ class Plotter:
         else:
             plt.ylim(Plotter.optimal_ylim(data[config['y_var']]))
         
+        # Add a legend if requested
+        plt.legend(**legend_kwargs)
         # Save the figure if requested
         if save_as:
             plt.savefig(save_as, dpi=dpi)
