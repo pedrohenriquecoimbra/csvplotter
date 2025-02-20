@@ -135,15 +135,15 @@ class Plotter:
             plot = sns.lineplot(data=data, x=config['x_var'], y=y,
                                 hue=config['hue'], style=config['style'], size=config['size'])
         
-        if config['x_label']:
+        if config.get('x_label', None):
             plt.xlabel(config['x_label'])
-        if config['y_label']:
+        if config.get('y_label', None):
             plt.ylabel(config['y_label'])
-        if config['title']:
+        if config.get('title', None):
             plt.title(config['title'])
-        if config['xlim']:
+        if config.get('xlim', None):
             plt.xlim(config['xlim'])
-        if config['ylim']:
+        if config.get('ylim', None):
             plt.ylim(config['ylim'])
         else:
             plt.ylim(Plotter.optimal_ylim(data[config['y_var']]))
