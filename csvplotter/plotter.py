@@ -120,6 +120,8 @@ class Plotter:
         """ Plot based on the configuration from CSV """
         if data is None:  # Check explicitly for None
             data = self.data  # Use self.data if no data is provided
+
+        config.update(kwargs)
         self.apply_style(self.style)
         
         #self._set_theme(config.get('theme', 'light'), config.get('palette', 'viridis'))
