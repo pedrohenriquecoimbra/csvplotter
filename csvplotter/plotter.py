@@ -83,7 +83,47 @@ class Plotter:
             return None, None
 
         return optimal_min, optimal_max
-    
+
+    @staticmethod
+    def literal_eval(config):
+        """ Evaluate literal string as Python code """
+        config['y_var'] = config['y_var'].replace(
+            {None: "[]"}).apply(lambda x: ast.literal_eval(x) if '[' in x else x)
+        
+        for p in ['xlim', 'ylim']:
+            if p in config:
+                config[p] = config[p].replace({None: "''"}).apply(
+                    ast.literal_eval).replace({'': None})
+        
+        for p in ['y_var_label', 'origin_file']:
+            if p in config:
+                config[p] = config[p].replace({None: "[]"}).apply(
+                    lambda x: ast.literal_eval(x) if '[' in x else x)
+        return config
+
+    @staticmethod
+    def try_date_ticks(data, var, axis=0):
+        if axis == 0:
+            ticks = plt.xticks
+        elif axis == 1:
+            ticks = plt.yticks
+        try:
+            x_0000 = data[var][data[var].dt.time == datetime.time(0, 0)]
+            if len(x_0000) > 3:
+                if len(data[var].dt.month.unique()) > 3:
+                    ticks([list(x_0000)[int(i)] for i in np.linspace(0, len(x_0000)-1, 5)],
+                        [list(x_0000)[int(i)].strftime("%d/%m/%Y") for i in np.linspace(0, len(x_0000)-1, 5)])
+                else:
+                    ticks([list(x_0000)[int(i)] for i in np.linspace(0, len(x_0000)-1, min(len(x_0000), 5))],
+                        [list(x_0000)[int(i)].strftime("%d/%m") for i in np.linspace(0, len(x_0000)-1, min(len(x_0000), 5))])
+            else:
+                # check if data_fc[x_var] is datetime type
+                ticks([list(data[var])[int(i)] for i in np.linspace(0, len(data)-1, 5)],
+                    [list(data[var])[int(i)].strftime("%d/%m %H:%M") for i in np.linspace(0, len(data)-1, 5)])
+        except Exception as e:
+            print(e)
+        return
+
     def windroseplot(self, config, save_as=None, data=None, opening=0.94, nsector=36, edgecolor='white', dpi=300):
         from windrose import WindroseAxes
 
@@ -104,6 +144,20 @@ class Plotter:
         else:
             plt.show()
         return
+
+    @staticmethod
+    def __read_config__(config):
+        """ Read CSV and plot all rows """
+        # Read the configuration CSV file
+        if isinstance(config, str) and os.path.exists(config):
+            config = pd.read_csv(config).fillna(
+                'None').replace({float('nan'): None, np.nan: None, 'None': None})
+        else:
+            config = pd.DataFrame(config)
+
+        # Convert columns to Python objects
+        config = Plotter.literal_eval(config)
+        return config
 
     def plot_multiprocess_wrapper(self, args):
         config, kwargs = args
