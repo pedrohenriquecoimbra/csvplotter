@@ -231,41 +231,38 @@ class Plotter:
         # Save the figure if requested
         if save_as:
             plt.savefig(save_as, dpi=dpi)
-            plt.close()
         else:
             plt.show()
-        return
-    
-    def plot_from_csv(self, config, data=None,
-                      theme='default', palette='viridis', aspect='big', 
-                      save_folder=None, multi_process=False, **kwargs):
-        """ Read CSV and plot all rows """
-        # Read the configuration CSV file
-        if isinstance(config, str) and os.path.exists(config):
-            config_df = pd.read_csv(config).fillna(
-                'None').replace({'None': None})
-        else:
-            config_df = pd.DataFrame(config)
         
-        # Convert the y_var column to a list
-        config_df['y_var'] = config_df['y_var'].replace(
-            {None: "[]"}).apply(lambda x: ast.literal_eval(x) if '[' in x else x)
+        # Close the plot to avoid memory leaks
+        plt.close()
+        return
 
+    def serial_plot(self, config, data=None,
+                    theme='default', palette='viridis', aspect='big',
+                    save_folder=None, multi_process=False, **kwargs):
         # Prepare the list of jobs for multi-processing
         jobs = []
-        for index, row in config_df.iterrows():
-            config = row.to_dict()  # Convert row to dictionary
-            file_name = config.pop('savn', None)
-            config.update(dict(theme=theme, palette=palette, aspect=aspect))
+        for index, row in config.iterrows():
+            cfg = dict(theme=theme, palette=palette, aspect=aspect)
+            cfg.update(row.to_dict())  # Convert row to dictionary
+            file_name = cfg.pop('savn', None)
 
-            save_as = f"{save_folder}/{file_name}" if save_folder else file_name
+            save_as = f"{save_folder}/{file_name}" if save_folder else None
             kwargs.update(dict(save_as=save_as, data=data))
             if multi_process:
-                jobs.append((config, kwargs.copy()))
+                jobs.append((cfg, kwargs.copy()))
             else:
-                self.plot_wrapper(config, **kwargs)
+                self.plot_wrapper(cfg, **kwargs)
 
         if multi_process:
             with concurrent.futures.ProcessPoolExecutor() as executor:
                 executor.map(self.plot_multiprocess_wrapper, jobs)
+        return
+    
+    def plot_from_csv(self, config, **kwargs):
+        """ Read CSV and plot all rows """
+        # Read the configuration CSV file
+        config = Plotter.__read_config__(config)
+        config = self.serial_plot(config, **kwargs)
         return
