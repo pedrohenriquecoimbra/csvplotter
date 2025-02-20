@@ -205,9 +205,6 @@ class Plotter:
             plt.close()
             return
         
-        if isinstance(config['y_var'], str):
-            config['y_var'] = [config['y_var']]
-            
         for y in config['y_var']:
             plot = sns.lineplot(data=data, x=config['x_var'], y=y,
                                 hue=config['hue'], style=config['style'], size=config['size'])
