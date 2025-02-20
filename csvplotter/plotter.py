@@ -198,6 +198,12 @@ class Plotter:
         
         plt.figure(figsize=Plotter._get_figure_size(
             config.get('aspect', 'wide')))
+
+        if sum([(config[v] not in data.columns) for v in ['hue', 'style', 'size'] if config.get(v, None) is not None]) or \
+                len(config['x_var'])==0 or len(config['y_var'])==0:
+            # print("Error: One or more of the hue, style, or size variables are not in the data.")
+            plt.close()
+            return
         
         if isinstance(config['y_var'], str):
             config['y_var'] = [config['y_var']]
