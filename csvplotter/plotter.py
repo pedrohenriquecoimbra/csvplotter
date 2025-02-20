@@ -205,9 +205,19 @@ class Plotter:
             plt.close()
             return
         
-        for y in config['y_var']:
-            plot = sns.lineplot(data=data, x=config['x_var'], y=y,
-                                hue=config['hue'], style=config['style'], size=config['size'])
+        # Plot the data
+        if config['x_var'] not in config['y_var']:
+            data_m = data.melt(id_vars=[config['x_var']] + [config[k] for k in ['hue', 'style', 'size'] if config[k]],
+                            value_vars=config['y_var'], var_name='variable', value_name='y_val')
+            data_m['variable'] = data_m['variable'].replace(
+                config['y_var'], config['y_var_label'])
+            sns.lineplot(data=data_m, x=config['x_var'], y='y_val', hue='variable', **{k: config[k] for k in [
+                        'style', 'size'] if config[k]})
+        else:
+            for y, l in list(zip(config['y_var'], config['y_var_label'])):
+                plot_kwargs = {k: config[k] for k in [
+                    'hue', 'style', 'size'] if config[k]} or {'label': l}
+                sns.lineplot(data=data, x=config['x_var'], y=y, **plot_kwargs)
         
         if config.get('x_label', None):
             plt.xlabel(config['x_label'])
