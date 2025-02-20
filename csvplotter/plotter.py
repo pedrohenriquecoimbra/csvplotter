@@ -79,6 +79,9 @@ class Plotter:
         optimal_min = lower_percentile - pad_amount
         optimal_max = upper_percentile + pad_amount
 
+        if optimal_min == optimal_max:
+            return None, None
+
         return optimal_min, optimal_max
     
     def windroseplot(self, config, save_as=None, data=None, opening=0.94, nsector=36, edgecolor='white', dpi=300):
