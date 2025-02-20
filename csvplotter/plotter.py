@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import concurrent.futures
+import datetime
 
 class Plotter:
     def __init__(self, data, style="default"):
@@ -25,7 +26,8 @@ class Plotter:
         """
         #style_path = f"Plotter/{self.style}.mplstyle"  # Look for style in the styles folder
         try: #if os.path.exists(style_path) or style_path in plt.style.available:
-            plt.style.use(style)  # Apply the style
+            if style is not None:
+                plt.style.use(style)  # Apply the style
         except:
             print(
                 f"Warning: Style '{style}' not found. Using default style.")
@@ -189,6 +191,7 @@ class Plotter:
         if not config.get('y_var_label', None):
             config['y_var_label'] = config['y_var']
 
+        # Apply the selected style
         self.apply_style(self.style)
         
         #self._set_theme(config.get('theme', 'light'), config.get('palette', 'viridis'))
@@ -216,8 +219,15 @@ class Plotter:
         else:
             plt.ylim(Plotter.optimal_ylim(data[config['y_var']]))
         
+        # Try to set date ticks
+        self.try_date_ticks(data, config['x_var'], axis=0)
+
         # Add a legend if requested
         plt.legend(**legend_kwargs)
+
+        # Adjust the padding between and around subplots
+        plt.tight_layout()
+
         # Save the figure if requested
         if save_as:
             plt.savefig(save_as, dpi=dpi)
