@@ -46,7 +46,7 @@ class Plotter:
             return aspect
         else:
             aspect_dict = {'small': (6, 4), 'medium': (
-                8, 6), 'big': (10, 8), 'wide': (12, 6)}
+                8, 6), 'big': (10, 8), 'wide': (12, 6), 'very-wide': (24, 4)}
             return aspect_dict.get(aspect, (8, 6))
 
     @staticmethod
