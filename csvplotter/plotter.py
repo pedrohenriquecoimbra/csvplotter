@@ -190,6 +190,7 @@ class Plotter:
         # Set the labels if not provided
         if not config.get('y_var_label', None):
             config['y_var_label'] = config['y_var']
+        config['y_var_label'] = [l if l else v for v, l in zip(config['y_var'], config['y_var_label'])]
 
         # Apply the selected style
         self.apply_style(self.style)
