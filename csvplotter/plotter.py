@@ -171,11 +171,19 @@ class Plotter:
         config, kwargs = args
         return self.plot_wrapper(config, **kwargs)
 
-    def plot_wrapper(self, config, *args, **kwargs):
-        if config.get('kind', None) == 'windrose':
-            self.windroseplot(config, *args, **kwargs)
-        else:
-            self.plot(config, *args, **kwargs)
+    def plot_wrapper(self, config, error=None, *args, **kwargs):
+        try:
+            if config.get('kind', None) == 'windrose':
+                self.windroseplot(config, *args, **kwargs)
+            else:
+                self.plot(config, *args, **kwargs)
+        except Exception as e:
+            if error == 'ignore':
+                pass
+            elif error == 'raise':
+                raise e
+            else:
+                print(f"Error: {e}")
         return
     
     def plot(self, config, save_as=None, data=None, dpi=None, legend_kwargs={}, **kwargs):
