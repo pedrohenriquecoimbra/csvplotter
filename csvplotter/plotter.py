@@ -1,5 +1,6 @@
 import os
 import ast
+import re
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -179,10 +180,11 @@ class Plotter:
     
     def plot(self, config, save_as=None, data=None, dpi=None, legend_kwargs={}, **kwargs):
         """ Plot based on the configuration from CSV """
+        config.update(kwargs)
+
         if data is None:  # Check explicitly for None
             data = self.data  # Use self.data if no data is provided
-
-        config.update(kwargs)
+        regex = config.get('regex', False)
 
         # Set the y_var as a list if it is a string
         if isinstance(config['y_var'], str):
@@ -190,10 +192,15 @@ class Plotter:
 
         # Only keep the columns that are present in the data
         config['x_var'] = config['x_var'] if config['x_var'] in data.columns else ''
-        config['y_var'] = [y for y in config['y_var'] if y in data.columns]
-
+        
+        if regex:
+            config['y_var'] = [c for y in config['y_var'] for c in data.filter(
+                regex="(?i)" + y).columns.tolist()]
+        else:
+            config['y_var'] = [y for y in config['y_var'] if y in data.columns]
+        
         # Set the labels if not provided
-        if not config.get('y_var_label', None):
+        if regex or not config.get('y_var_label', None):
             config['y_var_label'] = config['y_var']
         config['y_var_label'] = [l if l else v for v, l in zip(config['y_var'], config['y_var_label'])]
 
