@@ -65,11 +65,11 @@ class Plotter:
         - A tuple of (min, max) values for y-limits.
         """
         # Extract the relevant data for y_var
-        y_data = y_var.dropna()
+        y_data = y_var#.dropna(how='all')
 
         # Calculate the desired percentiles to avoid extreme values
-        lower_percentile = np.percentile(y_data, percentiles[0])
-        upper_percentile = np.percentile(y_data, percentiles[1])
+        lower_percentile = np.nanpercentile(y_data, percentiles[0])
+        upper_percentile = np.nanpercentile(y_data, percentiles[1])
 
         # Calculate the range based on the percentiles
         range_span = upper_percentile - lower_percentile
@@ -81,6 +81,11 @@ class Plotter:
         optimal_min = lower_percentile - pad_amount
         optimal_max = upper_percentile + pad_amount
 
+        # Ensure that the limits are not NaN or infinite
+        optimal_min = None if (pd.isna(optimal_min) or np.isinf(optimal_min)) else optimal_min
+        optimal_max = None if (pd.isna(optimal_max) or np.isinf(optimal_max)) else optimal_max
+
+        # Ensure that the limits are not equal
         if optimal_min == optimal_max:
             return None, None
 
