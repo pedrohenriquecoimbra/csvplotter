@@ -186,7 +186,8 @@ class Plotter:
                 print(f"Error: {e}")
         return
     
-    def plot(self, config, save_as=None, data=None, dpi=None, legend_kwargs={}, **kwargs):
+    def plot(self, config: dict, save_as: str = None, data: pd.DataFrame = None, 
+             dpi: int = None, legend_kwargs: dict = {}, **kwargs):
         """ Plot based on the configuration from CSV """
         config.update(kwargs)
 
