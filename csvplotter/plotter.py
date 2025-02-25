@@ -276,11 +276,16 @@ class Plotter:
     def serial_plot(self, config, data=None,
                     theme='default', palette='viridis', aspect='big',
                     save_folder=None, multi_process=False, **kwargs):
+        if isinstance(config, pd.DataFrame):
+            config = list(config.T.to_dict().values())
+        elif isinstance(config, pd.Series):
+            config = [config.to_dict()]
+        
         # Prepare the list of jobs for multi-processing
         jobs = []
-        for index, row in config.iterrows():
+        for row in config:
             cfg = dict(theme=theme, palette=palette, aspect=aspect)
-            cfg.update(row.to_dict())  # Convert row to dictionary
+            cfg.update(row)  # Convert row to dictionary
             file_name = cfg.pop('savn', None)
 
             save_as = f"{save_folder}/{file_name}" if save_folder else None
