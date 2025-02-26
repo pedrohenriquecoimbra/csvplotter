@@ -277,7 +277,7 @@ class Plotter:
 
     def serial_plot(self, config, data=None,
                     theme='default', palette='viridis', aspect='big',
-                    save_folder=None, multi_process=False, **kwargs):
+                    multi_process=False, **kwargs):
         if isinstance(config, pd.DataFrame):
             config = list(config.T.to_dict().values())
         elif isinstance(config, pd.Series):
@@ -288,10 +288,8 @@ class Plotter:
         for row in config:
             cfg = dict(theme=theme, palette=palette, aspect=aspect)
             cfg.update(row)  # Convert row to dictionary
-            file_name = cfg.pop('savn', None)
-
-            save_as = f"{save_folder}/{file_name}" if save_folder else None
-            kwargs.update(dict(save_as=save_as, data=data))
+            
+            kwargs.update(dict(save_as=cfg.pop('save_as', None), data=data))
             if multi_process:
                 jobs.append((cfg, kwargs.copy()))
             else:
