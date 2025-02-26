@@ -128,6 +128,8 @@ class Plotter:
                 # check if data_fc[x_var] is datetime type
                 ticks([list(data[var])[int(i)] for i in np.linspace(0, len(data)-1, 5)],
                     [list(data[var])[int(i)].strftime("%d/%m %H:%M") for i in np.linspace(0, len(data)-1, 5)])
+        except AttributeError:
+            pass
         except Exception as e:
             print(e)
         return
