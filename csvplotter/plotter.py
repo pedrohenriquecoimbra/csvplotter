@@ -7,6 +7,12 @@ import pandas as pd
 import numpy as np
 import concurrent.futures
 import datetime
+import argparse
+from io import BytesIO
+from PIL import Image
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Plotter:
     def __init__(self, data, style="default"):
@@ -176,9 +182,9 @@ class Plotter:
     def plot_wrapper(self, config, error=None, *args, **kwargs):
         try:
             if config.get('kind', None) == 'windrose':
-                self.windroseplot(config, *args, **kwargs)
+                return self.windroseplot(config, *args, **kwargs)
             else:
-                self.plot(config, *args, **kwargs)
+                return self.plot(config, *args, **kwargs)
         except Exception as e:
             if error == 'ignore':
                 pass
@@ -220,7 +226,7 @@ class Plotter:
         
         #self._set_theme(config.get('theme', 'light'), config.get('palette', 'viridis'))
         
-        plt.figure(figsize=Plotter._get_figure_size(
+        fig = plt.figure(figsize=Plotter._get_figure_size(
             config.get('aspect', 'wide')))
 
         if sum([(config[v] not in data.columns) for v in ['hue', 'style', 'size'] if config.get(v, None) is not None]) or \
@@ -269,7 +275,20 @@ class Plotter:
         if save_as:
             plt.savefig(save_as, dpi=dpi)
         else:
+            # Save the plot to a BytesIO buffer
+            buffer = BytesIO()
+            fig.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
+            buffer.seek(0)  # Rewind the buffer
+
+            # Load the buffer into a PIL Image
+            pil_image = Image.open(buffer)
+            
             plt.show()
+            
+            # Close the plot to avoid memory leaks
+            plt.close()
+
+            return pil_image
         
         # Close the plot to avoid memory leaks
         plt.close()
@@ -282,9 +301,12 @@ class Plotter:
             config = list(config.T.to_dict().values())
         elif isinstance(config, pd.Series):
             config = [config.to_dict()]
+        elif isinstance(config, dict):
+            config = [config]
         
         # Prepare the list of jobs for multi-processing
         jobs = []
+        results = []
         for row in config:
             cfg = dict(theme=theme, palette=palette, aspect=aspect)
             cfg.update(row)  # Convert row to dictionary
@@ -293,12 +315,12 @@ class Plotter:
             if multi_process:
                 jobs.append((cfg, kwargs.copy()))
             else:
-                self.plot_wrapper(cfg, **kwargs)
+                results.append(self.plot_wrapper(cfg, **kwargs))
 
         if multi_process:
             with concurrent.futures.ProcessPoolExecutor() as executor:
-                executor.map(self.plot_multiprocess_wrapper, jobs)
-        return
+                results = list(executor.map(self.plot_multiprocess_wrapper, jobs))
+        return results
     
     def plot_from_csv(self, config, **kwargs):
         """ Read CSV and plot all rows """
