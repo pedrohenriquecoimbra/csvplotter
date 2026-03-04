@@ -4,6 +4,7 @@ import re
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
+import xarray as xr
 import numpy as np
 import concurrent.futures
 import datetime
@@ -25,6 +26,22 @@ class Plotter:
         """
         self.data = data
         self.style = style
+
+    @staticmethod
+    def validate_data_type(data):
+        """
+        Check data
+        allowed types are str to netcdf, dict or pandas.DataFrame 
+        """
+        assert (isinstance(data, (str, pd.DataFrame))), f'Data format not accepted ({type(data)}).'
+        if isinstance(data, pd.DataFrame):
+            return data
+        elif isinstance(data, str):
+            try:
+                data = pd.read_csv(data)
+            except:
+                pass
+        return None
 
     @staticmethod
     def apply_style(style):
@@ -328,3 +345,73 @@ class Plotter:
         config = Plotter.__read_config__(config)
         config = self.serial_plot(config, **kwargs)
         return
+
+
+def __custom_params__(unknown_args):
+    def convert_to_number(value):
+        try:
+            return int(value)
+        except ValueError:
+            try:
+                return float(value)
+            except ValueError:
+                return value
+
+    # Print or process unknown arguments
+    custom_params = {}
+    i = 0
+    while i < len(unknown_args):
+        logger.debug(f"Custom/unknown arguments: {unknown_args}")
+        # You can store or process these as needed, e.g.:
+        arg = unknown_args[i]
+        if arg.startswith("--"):
+            key = arg[2:]
+            # Check if the next argument is a value (not starting with '--')
+            if i + 1 < len(unknown_args) and not unknown_args[i + 1].startswith("--"):
+                custom_params[key] = convert_to_number(unknown_args[i + 1])
+                i += 1  # Skip the next argument as it's the value
+            else:
+                custom_params[key] = True  # Flag argument
+        else:
+            # Handle values for the previous key if needed
+            custom_params[key].append(convert_to_number(arg))
+            pass
+        i += 1
+    return custom_params
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Run FrameworkAPI workflows.")
+    parser.add_argument("data",
+                        help="pandas DataFrame containing the data to plot.")
+    parser.add_argument("--style", default="default",
+                        help="Name of the matplotlib style to use (corresponds to a .mplstyle file).")
+    parser.add_argument("--config", required=True,
+                        help="Path to CSV configuration file.")
+    parser.add_argument("--aspect", default='big',
+                        help="Aspect ratio (tuple or string, e.g.: (4, 3), 'small', 'big', 'wide', ...")
+    parser.add_argument("--verbosity", default="INFO",
+                        help="Logging level (e.g., DEBUG, INFO, WARNING)")
+    # Parse known arguments and capture the rest
+    args, unknown_args = parser.parse_known_args()
+
+    # Validate logging level
+    valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    if args.verbosity.upper() not in valid_levels:
+        logger.error(
+            f"Invalid verbosity level. Choose from: {valid_levels}")
+        args.verbosity = "0"
+    logging.basicConfig(level=args.verbosity.upper(),
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    custom_params = __custom_params__(unknown_args)
+
+    config = Plotter.__read_config__(args.config)
+    Plotter(args.data, args.style).serial_plot(
+            config, aspect=args.aspect, **custom_params)
+    
+    return
+
+
+if __name__ == "__main__":
+    main()
